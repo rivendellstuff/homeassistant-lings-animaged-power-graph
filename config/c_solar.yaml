@@ -8,13 +8,13 @@
 
 ### 
 #
-# Install: 
-# 1. put the following line in your configuration.yml (wout the quotes): "sensor manual: !include c_solar.yaml"
+# Install:  
+# 1. put the following line in your configuration.yml (wout the quotes): "sensor manual: !include ./www/images/lings-animated-power-graph/config/c_solar.yaml"
 # 2. install "custom:html-template-card" from HACS
 # 3. create a new empty dashboard > click top right > Raw Editor
 # 4. put the lings-animated-power-graph folder into ~/www/images/
 # 5. copy and paste the lings-animated-power-graph-dashboard.yml content to the new dashboard > save
-# 6. read all the notes below - this setup natively uses the devices below.
+# 6. read all the notes below - this setup natively uses the devices:
 #    - APSystems Solar Inverters
 #    - Tesla Powerwalls
 # 7. You will need to rename the core sensors in THIS file to match your own battery IF not using Tesla powerwalls 
@@ -26,6 +26,8 @@
 #    - you will need to rename the core sensors below using Find and Replace ( SEE SENSORS TO REPLACE a few lines down )
 #
 # 10. If you use AP System inverters you can also use the dashboard: lings-ap-systems-inverter-monitor.yml to monitor the temp and output of each channel
+#      - you'll need to have the temperature sensors set up like below with your IDs
+#      - see the section below referencing sensor.solar_inverters_total_current_w for how to make the needed helpers
 #
 # NOTES:
 # - in/out in the naming refers to the direction of energy
@@ -40,7 +42,7 @@
 
 ### SENSORS TO REPLACE to get all the math to work
 # If you dont have the same devices measuring the same pieces you'd need to swap yours in for the core pieces
-# The math for everything ele should work once thats done
+# The math for everything ele should work once thats done as I've created virtual sensors that reference the core ones elsewhere
 # 
 # you can do a find and replace all for the following sensors (dont replace example?)
 #
@@ -49,7 +51,13 @@
 # sensor.powerwall_load_now = Total kW house is using NOW
 # sensor.powerwall_site_now = Total kW being used from the grid NOW
 # sensor.powerwall_charge = current charge level of battery
-# sensor.solar_inverters_total_current_w - this is a helper it adds up the apsystems inverters below total to get total w - this is delayed by about 5 mins, so use the powerwall sensor if avail
+# sensor.solar_inverters_total_current_w 
+#  - this is a helper it adds up the apsystems inverters below total to get total w 
+#  - this is delayed by about 5 mins, so use the powerwall/external sensor if avail
+#  - I made this sensor by making helpers for each inverter -> create helper > combine state > put inverter id > add both channels > repeat for each inverter
+#  - Finally make one more helper the same way but combine all the helpers you just made to get total output of power in w
+#  - name it sensor.solar_inverters_total_current_w and it should work in this file after that
+#  - I woulda made the helpers in here direct if I'd known how at the time
 
   # AP Systems Inverters (adjust IDs according to yours)
   # sets the temperature 0 when shutdown which prevents "unknown" from showing at night which skews the results
@@ -111,7 +119,7 @@
           {% if states('sensor.powerwall_solar_now') == 'unavailable' or states('sensor.powerwall_solar_now') == 'unknown' %}
             {{ states('sensor.solar_inverters_total_current_w')|float(2) / 1000|round(1) }}
           {% else %}
-            {{ states('sensor.powerwall_solar_now')|float(2)|round(1) }}
+            {{ states('sensor.powerwall_solar_now')|float(1)|round(1) }}
           {% endif %}
 
   - platform: template
@@ -119,7 +127,15 @@
       battery_charge_current:
         friendly_name: "Current Battery Charge Level"
         value_template: >-
-          states('sensor.powerwall_charge')
+          {{ states('sensor.powerwall_charge') }}
+
+### Total Grid Use
+  - platform: template
+    sensors:
+      grid_usage_current:
+        friendly_name: "Total Grid Usage Now kW"
+        value_template: >-
+          {{ states('sensor.powerwall_site_now')|float }}
 
 ### HOUSE SPECIFIC
 # Total House Use
@@ -138,7 +154,9 @@
         device_class: power
         unit_of_measurement: kW
         friendly_name: "Solar Remaining After House (kW)"
-        value_template: "{{ max(states('sensor.powerwall_solar_now')|float - states('sensor.powerwall_load_now')|float, 0.00)|round(1) }}"
+        value_template: >-
+          {% set cur_val = states('sensor.solar_kw')|float - states('sensor.house_total_now_kw')|float %}
+          {{ 0.0 if cur_val < 0.1 else cur_val|float(1)|round(1) }}
 
   # Solar being used to make house good
   - platform: template
@@ -147,7 +165,9 @@
         device_class: power
         unit_of_measurement: kW
         friendly_name: "House Consuming Solar (kW)"
-        value_template: "{{ max(states('sensor.powerwall_solar_now')|float - states('sensor.solar_remainder_after_house_kw')|float, 0.00)|round(1) }}"
+        value_template: >-
+          {% set cur_val = states('sensor.solar_kw')|float - states('sensor.solar_remainder_after_house_kw')|float %}
+          {{ 0.0 if cur_val < 0.1 else cur_val|float(1)|round(1) }}
 
   # Battery being used to make house good after Solar
   - platform: template
@@ -156,7 +176,9 @@
         device_class: power
         unit_of_measurement: kW
         friendly_name: "House Consuming Battery (kW)"
-        value_template: "{{ max(states('sensor.powerwall_load_now')|float - states('sensor.solar_used_for_house_kw')|float, 0.00)|round(1) }}"
+        value_template: >-
+          {% set cur_val = states('sensor.house_total_now_kw')|float - ( states('sensor.solar_used_for_house_kw')|float + states('sensor.grid_usage_current')|float ) %}
+          {{ 0.0 if cur_val <= 0.1 else cur_val|float(1)|round(1) }}
 
   # Grid being used to make house good after Solar and Battery
   - platform: template
@@ -165,7 +187,13 @@
         device_class: power
         unit_of_measurement: kW
         friendly_name: "House Consuming Grid (kW)"
-        value_template: "{{ max(states('sensor.powerwall_load_now')|float - (states('sensor.solar_used_for_house_kw')|float + states('sensor.battery_used_for_house_kw')|float), 0.00)|round(1) }}"
+        value_template: >-
+          {% set cur_val = states('sensor.house_total_now_kw')|float - (states('sensor.solar_used_for_house_kw')|float + states('sensor.battery_used_for_house_kw')|float) %}
+          {% if cur_val|float > 0 %}
+            {{ cur_val|float(1)|round(1) }}
+          {% else %}
+            {{ cur_val|float * -1|float(1)|round(1) }}
+          {% endif %}
 
   # Grid use after House is all good > probably going to battery now if not at min charge
   - platform: template
@@ -174,7 +202,10 @@
         device_class: power
         unit_of_measurement: kW
         friendly_name: "Grid Being Used NOT House (kW)"
-        value_template: "{{ max(states('sensor.powerwall_site_now')|float(1)|round(1) - states('sensor.grid_used_for_house_after_solar_and_battery_kw')|float, 0.00)|round(1) }}"
+        value_template: >-
+          {% set cur_val = states('sensor.grid_usage_current')|float - states('sensor.grid_used_for_house_after_solar_and_battery_kw')|float %}
+          {{ 0.0 if cur_val < 0 else cur_val|float(1)|round(1) }}
+
   ################################### General - End
 
 #########################################################################################################
@@ -192,8 +223,8 @@
         unit_of_measurement: kW
         friendly_name: "Battery Giving Total (discharging/out) (kW)"
         value_template: >-
-          {% set battery_now = states('sensor.powerwall_battery_now')|float(1)|round(1) %}
-          {{ states('sensor.battery_used_for_house_kw')|float(1)|round(1) if battery_now < 0 else battery_now }}
+          {% set battery_now = states('sensor.powerwall_battery_now')|float %}
+          {{ states('sensor.battery_used_for_house_kw')|float(1)|round(1) if battery_now < 0 else battery_now|float(1)|round(1) }}
 
   ## Use - Total
   - platform: template
@@ -215,7 +246,7 @@
         friendly_name: "Battery Consuming Grid (charging/in) (kW)"
         value_template: >-
           {% set total_battery = states('sensor.battery_consuming_in_total_now_kw')|float %}
-          {% set powerwall_charge = states('sensor.powerwall_charge')|float %}
+          {% set powerwall_charge = states('sensor.battery_charge_current')|float %}
           {% set grid_remainder = states('sensor.grid_remainder_after_house_kw')|float(1)|round(1) %}
           {{ 0.0 if total_battery <= 0 or powerwall_charge >= 100 else grid_remainder }}         
 
@@ -228,15 +259,15 @@
         friendly_name: "Battery Consuming Solar (charging/in) (kW)"
         value_template: >-
           {% set total_battery = states('sensor.battery_consuming_in_total_now_kw')|float %}
-          {% set powerwall_charge = states('sensor.powerwall_charge')|float %}
+          {% set powerwall_charge = states('sensor.battery_charge_current')|float %}
           {% set grid_battery = states('sensor.battery_consuming_in_grid_now_kw')|float %}
-          {% set solar_battery_raw = (total_battery - grid_battery) + states("sensor.battery_used_for_house_kw")|float(1) %}
+          {% set solar_battery_raw = (total_battery - grid_battery) + states("sensor.battery_used_for_house_kw")|float %}
           {% if total_battery <= 0 or powerwall_charge >= 100 %}
             {{ 0.0 }}
           {% elif solar_battery_raw < 0 %}
             {{ '%.1f' % (solar_battery_raw * -1)|float }}
           {% else %}
-            {{ solar_battery_raw|float|round(1) }}
+            {{ solar_battery_raw|float(1)|round(1) }}
           {% endif %}
 
 
@@ -256,8 +287,8 @@
         unit_of_measurement: kW
         friendly_name: "Grid Consumption (in) (kW)"
         value_template: >-
-          {% if states('sensor.powerwall_site_now')|float(1)|round(1) > 0.09 %}
-            {{ states('sensor.powerwall_site_now')|float(1)|round(1) }}
+          {% if states('sensor.grid_usage_current')|float(1)|round(1) > 0.09 %}
+            {{ states('sensor.grid_usage_current')|float(1)|round(1) }}
           {% else %}
               {{ 0.0 }}
           {% endif %}
@@ -270,9 +301,9 @@
         unit_of_measurement: kW
         friendly_name: "Grid Return Total (out) (kW)"
         value_template: >-
-          {% set current_battery_converted = states('sensor.powerwall_site_now')|float(1)|round(1) %}
+          {% set current_battery_converted = states('sensor.grid_usage_current')|float(1)|round(1) %}
           {% if current_battery_converted < 0.00 and current_battery_converted > -0.9 %}
-            {{states('sensor.powerwall_site_now')|float * -1}}
+            {{states('sensor.grid_usage_current')|float * -1}}
           {% else %}
               {{ 0.0 }}
           {% endif %}
@@ -293,8 +324,8 @@
         unit_of_measurement: kW
         friendly_name: "House Consuming Total (in) (kW)"
         value_template: >-
-          {% if states('sensor.powerwall_load_now') | float > 0 %}
-            {{ states('sensor.powerwall_load_now') }}
+          {% if states('sensor.house_total_now_kw') | float > 0 %}
+            {{ states('sensor.house_total_now_kw') }}
           {% else %}
               {{ 0 }}
           {% endif %}
@@ -306,7 +337,7 @@
         unit_of_measurement: kW
         friendly_name: "House Consuming Solar (in) (kW)"
         value_template: >-
-          {{ (states('sensor.powerwall_load_now')|float - states('sensor.battery_consuming_in_total_now_kw')|float) - states('sensor.powerwall_site_now')|float }}
+          {{ (states('sensor.house_total_now_kw')|float - states('sensor.battery_consuming_in_total_now_kw')|float) - states('sensor.grid_usage_current')|float }}
   ## Use - Battery
   - platform: template
     sensors:
@@ -324,7 +355,7 @@
         unit_of_measurement: kW
         friendly_name: "House Consuming Grid (in) (kW)"
         value_template: >-
-          {{ (states('sensor.powerwall_load_now')|float - states('sensor.house_consuming_in_solar_now_kw')|float) - states('sensor.house_consuming_in_battery_now_kw')|float }}
+          {{ (states('sensor.house_total_now_kw')|float - states('sensor.house_consuming_in_solar_now_kw')|float) - states('sensor.house_consuming_in_battery_now_kw')|float }}
 
   ################################### House - END
 

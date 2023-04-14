@@ -191,7 +191,7 @@ views:
                   font-size: 15px;
                   text-shadow: -0.05px 0 rgb(239, 176, 255), 0 0.05px rgb(239, 176, 255), 0.05px 0 rgb(239, 176, 255), 0 -0.05px rgb(239, 176, 255);
                   ">
-                    {{ states('sensor.powerwall_charge') }}%
+                    {{ states('sensor.battery_charge_current') }}%
                 </span>
             </span>
 
