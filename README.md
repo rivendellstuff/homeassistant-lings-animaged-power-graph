@@ -1,4 +1,5 @@
-instructions are at the top of c_solar.yaml in the config folder of this folder
+1. Git clone this into > your homeassistant folder ~/config/www/images  (you may have to make the images folder)
+2. instructions are at the top of c_solar.yaml in the config folder of this folder
 
 
 
