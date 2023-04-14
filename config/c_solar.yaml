@@ -1,0 +1,801 @@
+#########################################################################################################
+###################################                   ###################################################
+###################################                   ###################################################
+################################### SOLAR AND BATTERY ###################################################
+###################################                   ###################################################
+###################################   c_solar.yml     ###################################################
+#########################################################################################################
+
+### 
+#
+# Install: 
+# 1. put the following line in your configuration.yml (wout the quotes): "sensor manual: !include c_solar.yaml"
+# 2. install "custom:html-template-card" from HACS
+# 3. create a new empty dashboard > click top right > Raw Editor
+# 4. put the lings-animated-power-graph folder into ~/www/images/
+# 5. copy and paste the lings-animated-power-graph-dashboard.yml content to the new dashboard > save
+# 6. read all the notes below - this setup natively uses the devices below.
+#    - APSystems Solar Inverters
+#    - Tesla Powerwalls
+# 7. You will need to rename the core sensors in THIS file to match your own battery IF not using Tesla powerwalls 
+#      ( SEE SENSORS TO REPLACE a few lines down )
+# 8. The APSystems Devices are not used for the animated graph unless the Powerwall is reporting solar as unknown
+#      (its a backup as its delayed) ( SEE SENSORS TO REPLACE a few lines down )
+#
+# 9. If you have different batteries AND/OR NO batteries AND/OR are using different external sensors to get(site/load/solar/battery)
+#    - you will need to rename the core sensors below using Find and Replace ( SEE SENSORS TO REPLACE a few lines down )
+#
+# 10. If you use AP System inverters you can also use the dashboard: lings-ap-systems-inverter-monitor.yml to monitor the temp and output of each channel
+#
+# NOTES:
+# - in/out in the naming refers to the direction of energy
+#  - in = consuming (actively using POWER costing $$ )
+#  - out = giving/producing  e.g. solar is always a giver
+#
+### sensor.powerwall_YYYY_now
+#  - LOAD = HOUSE consumption TOTAL
+#  - SITE = GRID consumption  TOTAL (negative is sending back to grid)
+#  - BATTERY = BATTERY consumption (to house) (negative is charging batt)
+#  - SOLAR = SOLAR consumption TOTAL
+
+### SENSORS TO REPLACE to get all the math to work
+# If you dont have the same devices measuring the same pieces you'd need to swap yours in for the core pieces
+# The math for everything ele should work once thats done
+# 
+# you can do a find and replace all for the following sensors (dont replace example?)
+#
+# sensor.powerwall_load_now = Total kW house is using NOW
+# sensor.powerwall_solar_now = Total kW Solar is Generating NOW
+# sensor.powerwall_load_now = Total kW house is using NOW
+# sensor.powerwall_site_now = Total kW being used from the grid NOW
+# sensor.powerwall_charge = current charge level of battery
+# sensor.solar_inverters_total_current_w - this is a helper it adds up the apsystems inverters below total to get total w - this is delayed by about 5 mins, so use the powerwall sensor if avail
+
+  # AP Systems Inverters (adjust IDs according to yours)
+  # sets the temperature 0 when shutdown which prevents "unknown" from showing at night which skews the results
+  - platform: template
+    sensors:
+      temperature_non_numeric_703000131756:
+        value_template: "{{ states('sensor.inverter_703000131756_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000131807:
+        value_template: "{{ states('sensor.inverter_703000131807_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000132343:
+        value_template: "{{ states('sensor.inverter_703000132343_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000132515:
+        value_template: "{{ states('sensor.inverter_703000132515_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000132785:
+        value_template: "{{ states('sensor.inverter_703000132785_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000132910:
+        value_template: "{{ states('sensor.inverter_703000132910_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000132962:
+        value_template: "{{ states('sensor.inverter_703000132962_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000133075:
+        value_template: "{{ states('sensor.inverter_703000133075_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000133395:
+        value_template: "{{ states('sensor.inverter_703000133395_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000133418:
+        value_template: "{{ states('sensor.inverter_703000133418_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000133479:
+        value_template: "{{ states('sensor.inverter_703000133479_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_703000133683:
+        value_template: "{{ states('sensor.inverter_703000133683_temperature')|float(0) }}"
+        unit_of_measurement: "°C"                        
+
+#########################################################################################################
+###################################    HOUSE DELTA    ###################################################
+###################################    CALCULATIONS   ###################################################
+#########################################################################################################
+
+  ################################### General - Start
+
+  # Use powerwall first as it reports quicker but use APSystems as backup (or if dont have pwoerwall)
+  # convert watts to kw
+  - platform: template
+    sensors:
+      solar_kw:
+        unique_id: sensor_solar_kw
+        unit_of_measurement: kW
+        friendly_name: "Solar Inverters Total Current (kW)"
+        value_template: >-
+          {% if states('sensor.powerwall_solar_now') == 'unavailable' or states('sensor.powerwall_solar_now') == 'unknown' %}
+            {{ states('sensor.solar_inverters_total_current_w')|float(2) / 1000|round(1) }}
+          {% else %}
+            {{ states('sensor.powerwall_solar_now')|float(2)|round(1) }}
+          {% endif %}
+
+  - platform: template
+    sensors:
+      battery_charge_current:
+        friendly_name: "Current Battery Charge Level"
+        value_template: >-
+          states('sensor.powerwall_charge')
+
+### HOUSE SPECIFIC
+# Total House Use
+  - platform: template
+    sensors:
+      house_total_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Total House Usage Now (kW)"
+        value_template: "{{ states('sensor.powerwall_load_now')|float(1)|round(1) }}"
+
+# Remainder of Solar after house is good
+  - platform: template
+    sensors:
+      solar_remainder_after_house_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Solar Remaining After House (kW)"
+        value_template: "{{ max(states('sensor.powerwall_solar_now')|float - states('sensor.powerwall_load_now')|float, 0.00)|round(1) }}"
+
+  # Solar being used to make house good
+  - platform: template
+    sensors:
+      solar_used_for_house_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "House Consuming Solar (kW)"
+        value_template: "{{ max(states('sensor.powerwall_solar_now')|float - states('sensor.solar_remainder_after_house_kw')|float, 0.00)|round(1) }}"
+
+  # Battery being used to make house good after Solar
+  - platform: template
+    sensors:
+      battery_used_for_house_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "House Consuming Battery (kW)"
+        value_template: "{{ max(states('sensor.powerwall_load_now')|float - states('sensor.solar_used_for_house_kw')|float, 0.00)|round(1) }}"
+
+  # Grid being used to make house good after Solar and Battery
+  - platform: template
+    sensors:
+      grid_used_for_house_after_solar_and_battery_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "House Consuming Grid (kW)"
+        value_template: "{{ max(states('sensor.powerwall_load_now')|float - (states('sensor.solar_used_for_house_kw')|float + states('sensor.battery_used_for_house_kw')|float), 0.00)|round(1) }}"
+
+  # Grid use after House is all good > probably going to battery now if not at min charge
+  - platform: template
+    sensors:
+      grid_remainder_after_house_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Grid Being Used NOT House (kW)"
+        value_template: "{{ max(states('sensor.powerwall_site_now')|float(1)|round(1) - states('sensor.grid_used_for_house_after_solar_and_battery_kw')|float, 0.00)|round(1) }}"
+  ################################### General - End
+
+#########################################################################################################
+###################################      BATTERY      ###################################################
+###################################    CALCULATIONS   ###################################################
+#########################################################################################################
+
+  ################################### Battery - Start
+
+  ## Give - Total
+  - platform: template
+    sensors:
+      battery_giving_out_total_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Battery Giving Total (discharging/out) (kW)"
+        value_template: >-
+          {% set battery_now = states('sensor.powerwall_battery_now')|float(1)|round(1) %}
+          {{ states('sensor.battery_used_for_house_kw')|float(1)|round(1) if battery_now < 0 else battery_now }}
+
+  ## Use - Total
+  - platform: template
+    sensors:
+      battery_consuming_in_total_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Battery Consuming Total (charging/in) (kW)"
+        value_template: >-
+          {% set battery_now = states('sensor.powerwall_battery_now')|float %}
+          {{ battery_now * -1 if battery_now < 0 else 0.0  }}
+
+  ## Use - Grid
+  - platform: template
+    sensors:
+      battery_consuming_in_grid_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Battery Consuming Grid (charging/in) (kW)"
+        value_template: >-
+          {% set total_battery = states('sensor.battery_consuming_in_total_now_kw')|float %}
+          {% set powerwall_charge = states('sensor.powerwall_charge')|float %}
+          {% set grid_remainder = states('sensor.grid_remainder_after_house_kw')|float(1)|round(1) %}
+          {{ 0.0 if total_battery <= 0 or powerwall_charge >= 100 else grid_remainder }}         
+
+  ## Use - Solar
+  - platform: template
+    sensors:
+      battery_consuming_in_solar_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Battery Consuming Solar (charging/in) (kW)"
+        value_template: >-
+          {% set total_battery = states('sensor.battery_consuming_in_total_now_kw')|float %}
+          {% set powerwall_charge = states('sensor.powerwall_charge')|float %}
+          {% set grid_battery = states('sensor.battery_consuming_in_grid_now_kw')|float %}
+          {% set solar_battery_raw = (total_battery - grid_battery) + states("sensor.battery_used_for_house_kw")|float(1) %}
+          {% if total_battery <= 0 or powerwall_charge >= 100 %}
+            {{ 0.0 }}
+          {% elif solar_battery_raw < 0 %}
+            {{ '%.1f' % (solar_battery_raw * -1)|float }}
+          {% else %}
+            {{ solar_battery_raw|float|round(1) }}
+          {% endif %}
+
+
+  ################################### Battery - End
+  
+#########################################################################################################
+###################################        Grid       ###################################################
+###################################    CALCULATIONS   ###################################################
+#########################################################################################################
+
+  ################################### Grid - Start
+  ## Use From Grid - Total
+  - platform: template
+    sensors:
+      grid_consuming_in_total_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Grid Consumption (in) (kW)"
+        value_template: >-
+          {% if states('sensor.powerwall_site_now')|float(1)|round(1) > 0.09 %}
+            {{ states('sensor.powerwall_site_now')|float(1)|round(1) }}
+          {% else %}
+              {{ 0.0 }}
+          {% endif %}
+
+  ## Give (return to grid) - Total
+  - platform: template
+    sensors:
+      grid_return_out_total_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Grid Return Total (out) (kW)"
+        value_template: >-
+          {% set current_battery_converted = states('sensor.powerwall_site_now')|float(1)|round(1) %}
+          {% if current_battery_converted < 0.00 and current_battery_converted > -0.9 %}
+            {{states('sensor.powerwall_site_now')|float * -1}}
+          {% else %}
+              {{ 0.0 }}
+          {% endif %}
+
+  ################################### Grid - End
+
+#########################################################################################################
+###################################       HOUSE       ###################################################
+###################################    CALCULATIONS   ###################################################
+#########################################################################################################
+
+  ################################### House - Start
+  ## Use - Total
+  - platform: template
+    sensors:
+      house_consuming_in_total_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "House Consuming Total (in) (kW)"
+        value_template: >-
+          {% if states('sensor.powerwall_load_now') | float > 0 %}
+            {{ states('sensor.powerwall_load_now') }}
+          {% else %}
+              {{ 0 }}
+          {% endif %}
+  ## Use - Solar
+  - platform: template
+    sensors:
+      house_consuming_in_solar_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "House Consuming Solar (in) (kW)"
+        value_template: >-
+          {{ (states('sensor.powerwall_load_now')|float - states('sensor.battery_consuming_in_total_now_kw')|float) - states('sensor.powerwall_site_now')|float }}
+  ## Use - Battery
+  - platform: template
+    sensors:
+      house_consuming_in_battery_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "House Consuming Battrery (in) (kW)"
+        value_template: >-
+          {{ states('sensor.battery_consuming_in_total_now_kw')|float }}
+  ## Use - Grid
+  - platform: template
+    sensors:
+      house_consuming_in_grid_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "House Consuming Grid (in) (kW)"
+        value_template: >-
+          {{ (states('sensor.powerwall_load_now')|float - states('sensor.house_consuming_in_solar_now_kw')|float) - states('sensor.house_consuming_in_battery_now_kw')|float }}
+
+  ################################### House - END
+
+#########################################################################################################
+###################################       SOLAR       ###################################################
+###################################    CALCULATIONS   ###################################################
+#########################################################################################################
+
+  ################################### Solar - Start
+  ## Give - Total
+  - platform: template
+    sensors:
+      solar_giving_out_total_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Solar Giving Total (out) (kW)"
+        value_template: >-
+          {% if states('sensor.powerwall_solar_now')|float(1)|round(1) > 0 %}
+            {{ states('sensor.powerwall_solar_now')|float(1)|round(1) }}
+          {% else %}
+              0.0
+          {% endif %}
+  ## Give - Battery
+  - platform: template
+    sensors:
+      solar_giving_out_battery_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Solar Giving to Battery (out) (kW)"
+        value_template: >-
+          {% set current_batt = states('sensor.powerwall_solar_now')|float(1)|round(1) - states('sensor.house_consuming_in_solar_now_kw')|float(1)|round(1) %}
+          {% if current_batt < 0 %}
+              0
+          {% else %}
+            {{ current_batt }}
+          {% endif %}
+  ## Give - House (Load)
+  - platform: template
+    sensors:
+      solar_giving_out_house_now_kw:
+        device_class: power
+        unit_of_measurement: kW
+        friendly_name: "Solar Giving to House (out) (kW)"
+        value_template: >-
+          {% set current_house = states('sensor.powerwall_solar_now')|float(1)|round(1) - states('sensor.solar_giving_out_battery_now_kw')|float(1)|round(1) %}
+          {% if current < 0 %}
+              0
+          {% else %}
+            {{ current }}
+          {% endif %}
+
+#########################################################################################################
+###################################      USEFUL       ###################################################
+###################################    BOOL STATES    ###################################################
+#########################################################################################################
+### SOLAR
+# # Solar To House
+  - platform: template
+    sensors:
+      solar_to_house_bool:
+        friendly_name: "Solar >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.solar_used_for_house_kw')|float > 0 }}
+      solar_to_house_only_bool:
+        friendly_name: "Solar >> House ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.solar_to_house_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}              
+
+# # Solar To Battery
+  - platform: template
+    sensors:
+      solar_to_battery_bool:
+        friendly_name: "Solar >> Battery (boolean)"
+        value_template: >-
+          {{ states('sensor.battery_consuming_in_solar_now_kw')|float > 0 }}
+      solar_to_battery_only_bool:
+        friendly_name: "Solar >> Battery ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.solar_to_battery_bool') == 'True'
+          and states('sensor.solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}   
+
+# # Solar To Grid
+  - platform: template
+    sensors:
+      solar_to_grid_bool:
+        friendly_name: "Solar >> Grid (boolean)"
+        value_template: >-
+          {{ states('sensor.grid_return_out_total_now_kw')|float > 0 }}
+      solar_to_grid_only_bool:
+        friendly_name: "Solar >> Grid ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.solar_to_grid_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}              
+
+# # Solar To House AND Battery
+  - platform: template
+    sensors:
+      solar_to_house_and_battery_bool:
+        friendly_name: "Solar >> House AND Battery (boolean)"
+        value_template: >-
+          {{ states('sensor.solar_to_house_bool') == 'True' and states('sensor.solar_to_battery_bool') == 'True' }}
+      solar_to_house_and_battery_only_bool:
+        friendly_name: "Solar >> House and Battery ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.solar_to_house_and_battery_bool') == 'True'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+# # Solar To House AND Battery Also Battery to House
+  - platform: template
+    sensors:
+      solar_to_house_and_battery_also_battery_to_house_bool:
+        friendly_name: "Solar >> House AND Battery ALSO Battery >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.solar_to_house_bool') == 'True' and states('sensor.solar_to_battery_bool') == 'True' and states('sensor.battery_to_house_bool') == 'True'}}
+      solar_to_house_and_battery_also_battery_to_house_only_bool:
+        friendly_name: "Solar >> House AND Battery ALSO Battery >> House ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'True'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+
+# # Solar To House AND Grid
+  - platform: template
+    sensors:
+      solar_to_house_and_grid_bool:
+        friendly_name: "Solar >> House AND Grid (boolean)"
+        value_template: >-
+          {{ states('sensor.solar_to_house_bool') == 'True' and states('sensor.solar_to_grid_bool') == 'True' }}
+      solar_to_house_and_grid_only_bool:
+        friendly_name: "Solar >> House and Grid ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.solar_to_house_and_grid_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+# # Solar To House AND Battery AND Grid
+  - platform: template
+    sensors:
+      solar_to_house_and_battery_and_grid_bool:
+        friendly_name: "Solar >> House AND Battery AND Grid (boolean)"
+        value_template: >-
+          {{ states('sensor.solar_to_house_bool') == 'True' and states('sensor.solar_to_battery_bool') == 'True' and states('sensor.solar_to_grid_bool') == 'True' }}
+      solar_to_house_and_battery_and_grid_only_bool:
+        friendly_name: "Solar >> House and Battery and Grid ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.solar_to_house_and_battery_and_grid_bool') == 'True'
+          and states('sensor.solar_to_house_and_battery_only_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_only_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+### BATTERY
+# # Battery To House
+  - platform: template
+    sensors:
+      battery_to_house_bool:
+        friendly_name: "Battery >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.battery_used_for_house_kw')|float > 0 }}
+      battery_to_house_only_bool:
+        friendly_name: "Battery >> House ONLY (boolean)"
+        value_template: >-
+          {% if
+          states('sensor.battery_to_house_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          %}
+            {{ true }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+### GRID
+# # Grid To House
+  - platform: template
+    sensors:
+      grid_to_house_bool:
+        friendly_name: "Grid >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.grid_used_for_house_after_solar_and_battery_kw')|float > 0 }}
+      grid_to_house_only_bool:
+        friendly_name: "Grid >> House ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.grid_to_house_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+# # Grid To Battery
+  - platform: template
+    sensors:
+      grid_to_battery_bool:
+        friendly_name: "Grid >> Battery (boolean)"
+        value_template: >-
+          {{ states('sensor.battery_consuming_in_grid_now_kw')|float > 0 }}          
+      grid_to_battery_only_bool:
+        friendly_name: "Grid >> Battery ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.grid_to_battery_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+# # Grid To House AND Battery
+  - platform: template
+    sensors:
+      grid_to_house_and_battery_bool:
+        friendly_name: "Grid >> House AND Battery (boolean)"
+        value_template: >-
+          {{ states('sensor.grid_used_for_house_after_solar_and_battery_kw') == 'True' and states('sensor.battery_consuming_in_grid_now_kw') == 'True' }}
+      grid_to_house_and_battery_only_bool:
+        friendly_name: "Grid >> House AND Battery ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.grid_to_house_and_battery_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_only_bool') == 'False'
+          and states('sensor.grid_to_battery_only_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+# # Grid To Battery AND Battery to House (same time)
+  - platform: template
+    sensors:
+      grid_to_battery_and_battery_to_house_bool:
+        friendly_name: "Grid >> Battery AND Battery >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.grid_to_battery_bool') == 'True' and states('sensor.battery_to_house_bool') == 'True' }}
+      grid_to_battery_and_battery_to_house_only_bool:
+        friendly_name: "Grid >> House AND Battery ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.grid_to_battery_and_battery_to_house_bool') == 'True'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_only_bool') == 'False'
+          and states('sensor.grid_to_house_only_bool') == 'False'
+          and states('sensor.grid_to_battery_only_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          }}          
+
+### HOUSE
+# # Solar AND Battery To House
+  - platform: template
+    sensors:
+      solar_and_battery_to_house_bool:
+        friendly_name: "Solar AND Battery >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.solar_to_house_bool') == 'True' and states('sensor.battery_to_house_bool') == 'True' }}
+      solar_and_battery_to_house_only_bool:
+        friendly_name: "Solar AND Battery >> House ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.solar_and_battery_to_house_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+# # Grid AND Battery To House
+  - platform: template
+    sensors:
+      grid_and_battery_to_house_bool:
+        friendly_name: "Solar AND Battery >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.grid_to_house_bool') == 'True' and states('sensor.battery_to_house_bool') == 'True' }}
+      grid_and_battery_to_house_only_bool:
+        friendly_name: "Grid AND Battery >> House ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.grid_and_battery_to_house_bool') == 'True'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+# # Grid AND Battery AND Solar To House
+  - platform: template
+    sensors:
+      grid_and_battery_and_solar_to_house_bool:
+        friendly_name: "Grid AND Battery AND Solar >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.grid_to_house_bool') == 'True' and states('sensor.battery_to_house_bool') == 'True' and states('sensor.solar_to_house_bool') == 'True' }}          
+      grid_and_battery_and_solar_to_house_only_bool:
+        friendly_name: "Grid AND Battery AND Solar >> House ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.grid_and_battery_and_solar_to_house_bool') == 'True'
+          and states('sensor.solar_to_battery_bool') == 'False'
+          and states('sensor.solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.grid_to_battery_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          }}
+
+#########################################################################################################
+###################################                   ###################################################
+###################################                   ###################################################
+################################### SOLAR AND BATTERY ###################################################
+###################################                   ###################################################
+###################################                   ###################################################
+#########################################################################################################

@@ -1,0 +1,376 @@
+views:
+  - title: Home
+    cards:
+      - type: custom:html-template-card
+        ignore_line_breaks: true
+        always_update: true
+        content: |
+          <div style="position: relative;">
+            <img src=' {% if states('sensor.solar_to_house_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/01-animated-graph-base-solar-to-house.gif
+            {% elif states('sensor.solar_to_house_and_battery_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/02-animated-graph-base-solar-to-house-and-battery.gif
+            {% elif states('sensor.solar_to_house_and_grid_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/03-animated-graph-base-solar-to-house-and-grid.gif
+            {% elif states('sensor.solar_to_house_and_battery_and_grid_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/04-animated-graph-base-solar-to-house-and-battery-and-grid.gif
+            {% elif states('sensor.solar_to_battery_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/05-animated-graph-base-solar-to-battery.gif
+            {% elif states('sensor.battery_to_house_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/06-animated-graph-base-battery-to-house.gif  
+            {% elif states('sensor.grid_to_house_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/07-animated-graph-base-grid-to-house.gif
+            {% elif states('sensor.grid_to_battery_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/08-animated-graph-base-grid-to-battery.gif            
+            {% elif states('sensor.grid_to_house_and_battery_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/09-animated-graph-base-grid-to-house-and-battery.gif
+            {% elif states('sensor.solar_and_battery_to_house_only_bool') == 'True' %}
+              /local/images/lings-animated-power-graph/10-animated-graph-base-solar-and-battery-to-house.gif
+            {% elif states('sensor.grid_and_battery_and_solar_to_house_only_bool') =='True' %}
+              /local/images/lings-animated-power-graph/11-animated-graph-base-solar-and-battery-and-grid-to-house.gif
+            {% elif states('sensor.solar_to_house_and_battery_also_battery_to_house_only_bool') =='True' %}
+              /local/images/lings-animated-power-graph/12-animated-graph-base-solar-and-battery-home-solar-also-to-battery.gif
+            {% elif states('sensor.grid_to_battery_and_battery_to_house_only_bool') =='True' %}
+              /local/images/lings-animated-power-graph/13-animated-graph-base-grid-to-battery-and-battery-to-house.gif
+            {% else %}
+              /local/images/lings-animated-power-graph/000-ERROR-animated-graph-base-no-sun.png
+            {% endif %}'/>
+
+
+            <!-- SOLAR ################################################################################################ SOLAR -->
+            <!-- SOLAR ################################################################################################ SOLAR -->
+            <!-- SOLAR ################################################################################################ SOLAR -->
+            <!-- SOLAR ################################################################################################ SOLAR -->
+            <!-- Solar Total kW -->
+            <span style="
+                position: absolute;
+                top: 50px;
+                right: 0px;
+                color: rgb(0, 0, 0);
+                font-size: 15px;
+                font-weight: bold;
+                padding: 1px;
+                border: 3px solid rgb(252, 255, 63);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 1;
+                align-items: center;
+                " title="Total Solar Now in kW">
+                <span style="
+                align-items: center;        
+                font-size: 25px; 
+                color: rgb(252, 255, 63);
+                font-weight: bold;
+                text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                ">&#8666;
+                </span>
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.solar_giving_out_total_now_kw') }} (kW)
+                </span>
+            </span>
+
+
+            <!-- Battery from Solar kW -->
+            <span style="
+                position: absolute;
+                bottom: 170px;
+                left: 68px;
+                color: rgb(0, 0, 0);
+                font-size: 15px;
+                font-weight: bold;
+                padding: 1px;
+                border: 3px solid rgb(252, 255, 63);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Currently Being Charged by Solar kW">
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.battery_consuming_in_solar_now_kw') }} (kW)
+                </span>
+                <span style="
+                  align-items: center;        
+                  font-size: 25px; 
+                  color: rgb(252, 255, 63);
+                  font-weight: bold;
+                  text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                  ">&#8666;
+                </span>      
+            </span>
+
+
+                <!-- Battery from Grid kW -->
+                <span style="
+                position: absolute;
+                bottom: 140px;
+                left: 68px;
+                color: rgb(0, 0, 0);
+                font-size: 15px;
+                font-weight: bold;
+                padding: 1px;
+                border: 3px solid rgb(255, 16, 16);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Currently Being Charged by Grid kW">
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.battery_consuming_in_grid_now_kw') }} (kW)
+                </span>
+                <span style="
+                  align-items: center;        
+                  font-size: 25px; 
+                  color: rgb(255, 16, 16);
+                  font-weight: bold;
+                  text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                  ">&#8666;
+                </span>      
+            </span>
+
+            <!-- Battery ################################################################################################ BATTERY -->
+            <!-- Battery ################################################################################################ BATTERY -->
+            <!-- Battery ################################################################################################ BATTERY -->
+            <!-- Battery ################################################################################################ BATTERY -->
+            <!-- Battery Total kW -->
+            <span style="
+                position: absolute;
+                bottom: 250px;
+                left: 70px;
+                color: rgb(0, 0, 0);
+                font-size: 15px;
+                font-weight: bold;
+                padding: 1px;
+                border: 3px solid rgb(102, 255, 0);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Total Battery Being Used Now in kW">
+
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.battery_giving_out_total_now_kw') }} (kW)
+                </span>
+                <span style="
+                  align-items: center;        
+                  font-size: 25px; 
+                  color: rgb(102, 255, 0);
+                  font-weight: bold;
+                  text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                  ">&#8667;
+                </span>
+            </span>
+
+                <!-- Battery Current Charge -->
+                <span style="
+                position: absolute;
+                bottom: 100px;
+                align-items: center;      
+                text-align: center;  
+                left: 25px;
+                color: rgb(0, 0, 0);
+                font-size: 20px;
+                font-weight: bold;
+                padding: 1px;
+                opacity: 0.9;
+                align-items: center;
+                " title="Battery Current Charge Level">
+                
+                <span style="
+                align-items: center;      
+                text-align: center;  
+                font-size: 15px; 
+                color: rgb(203, 29, 247);
+                text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                ">&#9889;
+              </span>
+              </br>
+                <span style="
+                  flex: 1; 
+                  text-align: center;
+                  color: rgb(0, 0, 0);
+                  font-size: 15px;
+                  text-shadow: -0.05px 0 rgb(239, 176, 255), 0 0.05px rgb(239, 176, 255), 0.05px 0 rgb(239, 176, 255), 0 -0.05px rgb(239, 176, 255);
+                  ">
+                    {{ states('sensor.powerwall_charge') }}%
+                </span>
+            </span>
+
+
+            <!-- Grid ################################################################################################ Grid -->
+            <!-- Grid ################################################################################################ Grid -->
+            <!-- Grid ################################################################################################ Grid -->
+            <!-- Grid ################################################################################################ Grid -->
+            <!-- Grid Total kW -->
+            <span style="
+                position: absolute;
+                bottom: 55px;
+                right: 105px;
+                color: rgb(0, 0, 0);
+                font-size: 15px;
+                font-weight: bold;
+                padding: 1px;
+                border: 3px solid rgb(255, 16, 16);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Total Grid Being Used Now in kW">
+                <span style="
+                align-items: center;        
+                font-size: 20px; 
+                color: rgb(255, 16, 16);
+                font-weight: bold;
+                text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                ">&#10506;
+              </span>
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.grid_consuming_in_total_now_kw') }} (kW)
+                </span>
+            </span>
+
+            <!-- Grid Return kW -->
+            <span style="
+                position: absolute;
+                bottom: 25px;
+                right: 105px;
+                color: rgb(0, 0, 0);
+                font-size: 15px;
+                font-weight: bold;
+                padding: 1px;
+                border: 3px solid rgb(252, 255, 63);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Power Going Back to Grid Now kW">
+                <span style="
+                align-items: center;        
+                font-size: 20px; 
+                color: rgb(252, 255, 63);
+                font-weight: bold;
+                text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                ">&#10507;
+              </span>
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.grid_return_out_total_now_kw') }} (kW)
+                </span>
+            </span>    
+
+
+            <!-- HOUSE ################################################################################################ HOUSE -->
+            <!-- HOUSE ################################################################################################ HOUSE -->
+            <!-- HOUSE ################################################################################################ HOUSE -->
+            <!-- HOUSE ################################################################################################ HOUSE -->
+            <!-- House from Solar kW -->
+            <span style="
+                position: absolute;
+                bottom: 220px;
+                right: 35px;
+                color: rgb(0, 0, 0);
+                font-size: 10px;
+                font-weight: bold;
+                padding: 1px;
+                border: 2px solid rgb(252, 255, 63);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Solar to House Now in kW">
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.solar_used_for_house_kw') }} (kW)
+                </span>
+                <span style="
+                    align-items: center;        
+                    font-size: 10px; 
+                    color: rgb(252, 255, 63);
+                    font-weight: bold;
+                    text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                    ">&nbsp;&#9728;
+                  </span>
+            </span>
+
+            <!-- House from Battery kW -->
+            <span style="
+                position: absolute;
+                bottom: 195px;
+                right: 35px;
+                color: rgb(0, 0, 0);
+                font-size: 10px;
+                font-weight: bold;
+                padding: 0px;
+                border: 3px solid rgb(102, 255, 0);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Battery to House Now in kW">
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.battery_used_for_house_kw') }} (kW)
+                </span>
+                <span style="
+                  align-items: center;        
+                  font-size: 10px; 
+                  color: rgb(102, 255, 0);
+                  font-weight: bold;
+                  text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                  ">&nbsp;&#9850;
+                </span>
+            </span>
+
+                <!-- House from Grid kW -->
+                <span style="
+                position: absolute;
+                bottom: 168px;
+                right: 35px;
+                color: rgb(0, 0, 0);
+                font-size: 10px;
+                font-weight: bold;
+                padding: 1px;
+                border: 3px solid rgb(255, 16, 16);
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Grid to House Now in kW">
+                <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.grid_used_for_house_after_solar_and_battery_kw') }} (kW)
+                </span>
+                <span style="
+                  align-items: center;        
+                  font-size: 12px; 
+                  color: rgb(255, 16, 16);
+                  font-weight: bold;
+                  text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                  ">&#8779;
+                </span>
+            </span>
+
+          </div>
+
+      - type: custom:html-template-card
+        ignore_line_breaks: true
+        always_update: true
+        content: |
+          <b> {{ states("sensor.solar_kw") }} </b> - Solar Total (Giving) </br>
+          <b> {{ states("sensor.battery_giving_out_total_now_kw") }} </b> - Battery Total(Giving) </b></br>
+          <b> {{ states("sensor.grid_consuming_in_total_now_kw") }} </b> - Grid Total (Usage) </b></br> 
+
+          </br>
+
+          <b>{{ states("sensor.house_total_now_kw") }} </b> - House Total (Usage): </br> 
+          <b>{{ states("sensor.battery_consuming_in_total_now_kw") }} </b> - Battery Charging Total(Usage)</br>
+
+          </br>
+
+          </b> {{ states("sensor.solar_used_for_house_kw") }} </b> - Solar To House</br> 
+          </b> {{ states("sensor.battery_used_for_house_kw") }} </b> - Battery To House </br> 
+          </b> {{ states("sensor.grid_used_for_house_after_solar_and_battery_kw") }} </b> - Grid To House </br>
+
+          </br>
+
+          </b> {{ states("sensor.battery_consuming_in_solar_now_kw") }} </b> - Solar To Battery </br>
+          </b> {{ states("sensor.battery_consuming_in_grid_now_kw") }} </b> - Grid To Battery </br>
+
+          </br>
+
+          </b> {{ states("sensor.grid_return_out_total_now_kw") }} </b> - Solar To Grid </br>

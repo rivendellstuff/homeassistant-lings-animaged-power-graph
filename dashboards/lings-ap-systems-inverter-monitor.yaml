@@ -1,0 +1,551 @@
+views:
+  - theme: Backend-selected
+    icon: mdi:solar-panel-large
+    type: panel
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: gauge
+            entity: sensor.solar_kw
+            min: 0
+            max: 10
+            needle: true
+            severity:
+              green: 7
+              yellow: 3
+              red: 0
+          - type: picture
+            image: <link to image of your house roof showing panels>
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+          - type: custom:text-divider-row
+            text: Row 1
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000131756'
+                    title: Inverter 01 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000131756_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000131756_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_01_total_w_703000131756
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000131756
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000131807'
+                    title: Inverter 02 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000131807_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000131807_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_02_total_w_703000131807
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000131807
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000132343'
+                    title: Inverter 03 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000132343_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000132343_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_03_total_w_703000132343
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000132343
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000132515'
+                    title: Inverter 04 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000132515_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000132515_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_04_total_w_703000132515
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000132515
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+          - type: custom:text-divider-row
+            text: Row 2
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000132785'
+                    title: Inverter 05 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000132785_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000132785_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_05_total_w_703000132785
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000132785
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000132910'
+                    title: Inverter 06 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000132910_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000132910_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_06_total_w_703000132910
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000132910
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000132962'
+                    title: Inverter 07 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000132962_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000132962_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_07_total_w_703000132962
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000132962
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000133075'
+                    title: Inverter 08 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000133075_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000133075_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_08_total_w_703000133075
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000133075
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+          - type: custom:text-divider-row
+            text: Row 3
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000133395'
+                    title: Inverter 09 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000133395_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000133395_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_09_total_w_703000133395
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000133395
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000133418'
+                    title: Inverter 10 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000133418_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000133418_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_10_total_w_703000133418
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000133418
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000133479'
+                    title: Inverter 11 - 1 channel
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000133479_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000133479_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_11_total_w_703000133479
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000133479
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
+              - type: vertical-stack
+                cards:
+                  - type: markdown
+                    content: '**ID:** 703000133683'
+                    title: Inverter 12 - 2 channels
+                  - type: custom:dual-gauge-card
+                    title: Panels
+                    min: 0
+                    max: 230
+                    background_color: teal
+                    outer:
+                      entity: sensor.inverter_703000133683_power_ch_1
+                      label: 1
+                      unit: W
+                    inner:
+                      entity: sensor.inverter_703000133683_power_ch_2
+                      label: 2
+                      unit: W
+                    colors:
+                      - color: var(--label-badge-red)
+                        value: 50
+                      - color: var(--label-badge-yellow)
+                        value: 100
+                      - color: var(--label-badge-green)
+                        value: 190
+                  - type: gauge
+                    entity: sensor.solar_inverter_12_total_w_703000133683
+                    name: '- Total -'
+                    needle: true
+                    severity:
+                      green: 250
+                      yellow: 50
+                      red: 0
+                    min: 0
+                    max: 450
+                  - type: gauge
+                    entity: sensor.temperature_non_numeric_703000133683
+                    name: '- Temp -'
+                    needle: true
+                    severity:
+                      green: 0
+                      yellow: 60
+                      red: 90
