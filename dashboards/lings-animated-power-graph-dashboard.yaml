@@ -56,17 +56,17 @@ views:
                 opacity: 1;
                 align-items: center;
                 " title="Total Solar Now in kW">
-                <span style="
+              <span style="
                 align-items: center;        
                 font-size: 25px; 
                 color: rgb(252, 255, 63);
                 font-weight: bold;
                 text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                 ">&#8666;
-                </span>
-                <span style="flex: 1; text-align: center;">
+              </span>
+              <span style="flex: 1; text-align: center;">
                     {{ states('sensor.solar_giving_out_total_now_kw') }} (kW)
-                </span>
+              </span>
             </span>
 
 
@@ -85,22 +85,22 @@ views:
                 opacity: 0.9;
                 align-items: center;
                 " title="Currently Being Charged by Solar kW">
-                <span style="flex: 1; text-align: center;">
+              <span style="flex: 1; text-align: center;">
                     {{ states('sensor.battery_consuming_in_solar_now_kw') }} (kW)
-                </span>
-                <span style="
+              </span>
+              <span style="
                   align-items: center;        
                   font-size: 25px; 
                   color: rgb(252, 255, 63);
                   font-weight: bold;
                   text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                   ">&#8666;
-                </span>      
+              </span>      
             </span>
 
 
                 <!-- Battery from Grid kW -->
-                <span style="
+            <span style="
                 position: absolute;
                 bottom: 140px;
                 left: 68px;
@@ -114,17 +114,17 @@ views:
                 opacity: 0.9;
                 align-items: center;
                 " title="Currently Being Charged by Grid kW">
-                <span style="flex: 1; text-align: center;">
+              <span style="flex: 1; text-align: center;">
                     {{ states('sensor.battery_consuming_in_grid_now_kw') }} (kW)
-                </span>
-                <span style="
+              </span>
+              <span style="
                   align-items: center;        
                   font-size: 25px; 
                   color: rgb(255, 16, 16);
                   font-weight: bold;
                   text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                   ">&#8666;
-                </span>      
+              </span>      
             </span>
 
             <!-- Battery ################################################################################################ BATTERY -->
@@ -147,21 +147,21 @@ views:
                 align-items: center;
                 " title="Total Battery Being Used Now in kW">
 
-                <span style="flex: 1; text-align: center;">
+              <span style="flex: 1; text-align: center;">
                     {{ states('sensor.battery_giving_out_total_now_kw') }} (kW)
-                </span>
-                <span style="
+              </span>
+              <span style="
                   align-items: center;        
                   font-size: 25px; 
                   color: rgb(102, 255, 0);
                   font-weight: bold;
                   text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                   ">&#8667;
-                </span>
+              </span>
             </span>
 
                 <!-- Battery Current Charge -->
-                <span style="
+            <span style="
                 position: absolute;
                 bottom: 100px;
                 align-items: center;      
@@ -175,7 +175,7 @@ views:
                 align-items: center;
                 " title="Battery Current Charge Level">
                 
-                <span style="
+              <span style="
                 align-items: center;      
                 text-align: center;  
                 font-size: 15px; 
@@ -183,8 +183,8 @@ views:
                 text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                 ">&#9889;
               </span>
-              </br>
-                <span style="
+                </br>
+              <span style="
                   flex: 1; 
                   text-align: center;
                   color: rgb(0, 0, 0);
@@ -192,7 +192,7 @@ views:
                   text-shadow: -0.05px 0 rgb(239, 176, 255), 0 0.05px rgb(239, 176, 255), 0.05px 0 rgb(239, 176, 255), 0 -0.05px rgb(239, 176, 255);
                   ">
                     {{ states('sensor.battery_charge_current') }}%
-                </span>
+              </span>
             </span>
 
 
@@ -215,7 +215,7 @@ views:
                 opacity: 0.9;
                 align-items: center;
                 " title="Total Grid Being Used Now in kW">
-                <span style="
+              <span style="
                 align-items: center;        
                 font-size: 20px; 
                 color: rgb(255, 16, 16);
@@ -223,9 +223,9 @@ views:
                 text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                 ">&#10506;
               </span>
-                <span style="flex: 1; text-align: center;">
+              <span style="flex: 1; text-align: center;">
                     {{ states('sensor.grid_consuming_in_total_now_kw') }} (kW)
-                </span>
+              </span>
             </span>
 
             <!-- Grid Return kW -->
@@ -243,7 +243,7 @@ views:
                 opacity: 0.9;
                 align-items: center;
                 " title="Power Going Back to Grid Now kW">
-                <span style="
+              <span style="
                 align-items: center;        
                 font-size: 20px; 
                 color: rgb(252, 255, 63);
@@ -251,9 +251,9 @@ views:
                 text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                 ">&#10507;
               </span>
-                <span style="flex: 1; text-align: center;">
+              <span style="flex: 1; text-align: center;">
                     {{ states('sensor.grid_return_out_total_now_kw') }} (kW)
-                </span>
+              </span>
             </span>    
 
 
@@ -276,17 +276,17 @@ views:
                 opacity: 0.9;
                 align-items: center;
                 " title="Solar to House Now in kW">
-                <span style="flex: 1; text-align: center;">
+              <span style="flex: 1; text-align: center;">
                     {{ states('sensor.solar_used_for_house_kw') }} (kW)
-                </span>
-                <span style="
+              </span>
+              <span style="
                     align-items: center;        
                     font-size: 10px; 
                     color: rgb(252, 255, 63);
                     font-weight: bold;
                     text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                     ">&nbsp;&#9728;
-                  </span>
+              </span>
             </span>
 
             <!-- House from Battery kW -->
@@ -306,19 +306,19 @@ views:
                 " title="Battery to House Now in kW">
                 <span style="flex: 1; text-align: center;">
                     {{ states('sensor.battery_used_for_house_kw') }} (kW)
-                </span>
-                <span style="
+              </span>
+              <span style="
                   align-items: center;        
                   font-size: 10px; 
                   color: rgb(102, 255, 0);
                   font-weight: bold;
                   text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                   ">&nbsp;&#9850;
-                </span>
+              </span>
             </span>
 
-                <!-- House from Grid kW -->
-                <span style="
+            <!-- House from Grid kW -->
+            <span style="
                 position: absolute;
                 bottom: 168px;
                 right: 35px;
@@ -332,17 +332,45 @@ views:
                 opacity: 0.9;
                 align-items: center;
                 " title="Grid to House Now in kW">
-                <span style="flex: 1; text-align: center;">
+              <span style="flex: 1; text-align: center;">
                     {{ states('sensor.grid_used_for_house_after_solar_and_battery_kw') }} (kW)
-                </span>
-                <span style="
+              </span>
+              <span style="
                   align-items: center;        
                   font-size: 12px; 
                   color: rgb(255, 16, 16);
                   font-weight: bold;
                   text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
                   ">&#8779;
-                </span>
+              </span>
+            </span>
+
+                <!-- House Total kW -->
+            <span style="
+                position: absolute;
+                bottom: 130px;
+                right: 35px;
+                color: rgb(255, 255, 255);
+                font-size: 20px;
+                font-weight: bold;
+                padding: 3px;
+                border: 3px solid rgb(0, 0, 0);
+                border-radius: 5px;
+                background-color: rgba(31, 27, 27, 0.6);
+                opacity: 0.9;
+                align-items: center;
+                " title="Total House Now in kW">
+              <span style="
+                  align-items: center;        
+                  font-size: 16px; 
+                  color: rgb(0, 0, 0);
+                  font-weight: bold;
+                  text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;
+                  ">&#61;
+              </span>                 
+              <span style="flex: 1; text-align: center;">
+                    {{ states('sensor.house_total_now_kw') }} (kW)
+              </span>               
             </span>
 
           </div>
