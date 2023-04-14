@@ -204,7 +204,7 @@
         friendly_name: "Grid Being Used NOT House (kW)"
         value_template: >-
           {% set cur_val = states('sensor.grid_usage_current')|float - states('sensor.grid_used_for_house_after_solar_and_battery_kw')|float %}
-          {{ 0.0 if cur_val < 0 else cur_val|float(1)|round(1) }}
+          {{ 0.0 if cur_val < 0.05 else cur_val|float(1)|round(1) }}
 
   ################################### General - End
 
@@ -224,7 +224,7 @@
         friendly_name: "Battery Giving Total (discharging/out) (kW)"
         value_template: >-
           {% set battery_now = states('sensor.powerwall_battery_now')|float %}
-          {{ states('sensor.battery_used_for_house_kw')|float(1)|round(1) if battery_now < 0 else battery_now|float(1)|round(1) }}
+          {{ states('sensor.battery_used_for_house_kw')|float(1)|round(1) if battery_now < 0.05 else battery_now|float(1)|round(1) }}
 
   ## Use - Total
   - platform: template
@@ -234,8 +234,8 @@
         unit_of_measurement: kW
         friendly_name: "Battery Consuming Total (charging/in) (kW)"
         value_template: >-
-          {% set battery_now = states('sensor.powerwall_battery_now')|float %}
-          {{ battery_now * -1 if battery_now < 0 else 0.0  }}
+          {% set battery_now = states('sensor.powerwall_battery_now')|float(1)|round(1) %}
+          {{ battery_now * -1 if battery_now < 0.05 else 0.0  }}
 
   ## Use - Grid
   - platform: template
@@ -264,7 +264,7 @@
           {% set solar_battery_raw = (total_battery - grid_battery) + states("sensor.battery_used_for_house_kw")|float %}
           {% if total_battery <= 0 or powerwall_charge >= 100 %}
             {{ 0.0 }}
-          {% elif solar_battery_raw < 0 %}
+          {% elif solar_battery_raw < 0.05 %}
             {{ '%.1f' % (solar_battery_raw * -1)|float }}
           {% else %}
             {{ solar_battery_raw|float(1)|round(1) }}
@@ -387,7 +387,7 @@
         friendly_name: "Solar Giving to Battery (out) (kW)"
         value_template: >-
           {% set current_batt = states('sensor.powerwall_solar_now')|float(1)|round(1) - states('sensor.house_consuming_in_solar_now_kw')|float(1)|round(1) %}
-          {% if current_batt < 0 %}
+          {% if current_batt < 0.05 %}
               0
           {% else %}
             {{ current_batt }}
@@ -401,7 +401,7 @@
         friendly_name: "Solar Giving to House (out) (kW)"
         value_template: >-
           {% set current_house = states('sensor.powerwall_solar_now')|float(1)|round(1) - states('sensor.solar_giving_out_battery_now_kw')|float(1)|round(1) %}
-          {% if current < 0 %}
+          {% if current < 0.05 %}
               0
           {% else %}
             {{ current }}
