@@ -438,6 +438,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}              
 
 # # Solar To Battery
@@ -466,6 +467,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}   
 
 # # Solar To Grid
@@ -494,6 +496,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}              
 
 # # Solar To House AND Battery
@@ -520,6 +523,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 # # Solar To House AND Battery Also Battery to House
@@ -544,6 +548,7 @@
           and states('sensor.grid_and_battery_to_house_bool') == 'False'
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 
@@ -571,6 +576,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 # # Solar To House AND Battery AND Grid
@@ -596,6 +602,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 ### BATTERY
@@ -625,6 +632,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           %}
             {{ true }}
           {% else %}
@@ -658,6 +666,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 # # Grid To Battery
@@ -686,6 +695,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 # # Grid To House AND Battery
@@ -714,6 +724,7 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 # # Grid To Battery AND Battery to House (same time)
@@ -742,6 +753,7 @@
           and states('sensor.grid_and_battery_to_house_bool') == 'False'
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}          
 
 ### HOUSE
@@ -769,13 +781,14 @@
           and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 # # Grid AND Battery To House
   - platform: template
     sensors:
       grid_and_battery_to_house_bool:
-        friendly_name: "Solar AND Battery >> House (boolean)"
+        friendly_name: "Grid AND Battery >> House (boolean)"
         value_template: >-
           {{ states('sensor.grid_to_house_bool') == 'True' and states('sensor.battery_to_house_bool') == 'True' }}
       grid_and_battery_to_house_only_bool:
@@ -788,7 +801,31 @@
           and states('sensor.solar_to_house_and_grid_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
           and states('sensor.battery_to_house_bool') == 'False'
-          and states('sensor.grid_to_house_bool') == 'False'
+          and states('sensor.grid_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_battery_and_solar_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
+          and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
+          }}
+
+# # Grid AND Solar To House
+  - platform: template
+    sensors:
+      grid_and_solar_to_house_bool:
+        friendly_name: "Grid AND Solar >> House (boolean)"
+        value_template: >-
+          {{ states('sensor.grid_to_house_bool') == 'True' and states('sensor.solar_to_house_bool') == 'True' }}
+      grid_and_solar_to_house_only_bool:
+        friendly_name: "Grid AND Solar >> House ONLY (boolean)"
+        value_template: >-
+          {{ 
+          states('sensor.grid_and_solar_to_house_bool') == 'True'
+          and states('sensor.grid_and_battery_to_house_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_bool') == 'False'
+          and states('sensor.solar_to_house_and_grid_bool') == 'False'
+          and states('sensor.solar_to_house_and_battery_and_grid_bool') == 'False'
+          and states('sensor.battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_bool') == 'False'
           and states('sensor.grid_to_house_and_battery_bool') == 'False'
           and states('sensor.solar_and_battery_to_house_bool') == 'False'
@@ -821,6 +858,7 @@
           and states('sensor.grid_and_battery_to_house_bool') == 'False'
           and states('sensor.solar_to_house_and_battery_also_battery_to_house_bool') == 'False'
           and states('sensor.grid_to_battery_and_battery_to_house_bool') == 'False'
+          and states('sensor.grid_and_solar_to_house_bool') == 'False'
           }}
 
 #########################################################################################################

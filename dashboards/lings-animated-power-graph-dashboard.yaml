@@ -32,6 +32,10 @@ views:
               /local/images/lings-animated-power-graph/12-animated-graph-base-solar-and-battery-home-solar-also-to-battery.gif
             {% elif states('sensor.grid_to_battery_and_battery_to_house_only_bool') =='True' %}
               /local/images/lings-animated-power-graph/13-animated-graph-base-grid-to-battery-and-battery-to-house.gif
+            {% elif states('sensor.grid_and_battery_to_house_only_bool') =='True' %}
+              /local/images/lings-animated-power-graph/14-animated-graph-base-no-sun-battery-and-grid-to-house.gif
+            {% elif states('sensor.grid_and_solar_to_house_only_bool') =='True' %}
+              /local/images/lings-animated-power-graph/15-animated-graph-base-no-sun-solar-and-grid-to-house.gif                            
             {% else %}
               /local/images/lings-animated-power-graph/000-ERROR-animated-graph-base-no-sun.png
             {% endif %}'/>
