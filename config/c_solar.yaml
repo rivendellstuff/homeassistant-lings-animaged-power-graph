@@ -189,7 +189,7 @@
         friendly_name: "House Consuming Grid (kW)"
         value_template: >-
           {% set cur_val = states('sensor.house_total_now_kw')|float - (states('sensor.solar_used_for_house_kw')|float + states('sensor.battery_used_for_house_kw')|float) %}
-          {% if cur_val|float > 0 %}
+          {% if cur_val|float > 0.1 %}
             {{ cur_val|float(1)|round(1) }}
           {% else %}
             {{ cur_val|float * -1|float(1)|round(1) }}
