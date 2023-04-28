@@ -302,8 +302,8 @@
         friendly_name: "Grid Return Total (out) (kW)"
         value_template: >-
           {% set current_battery_converted = states('sensor.grid_usage_current')|float(1)|round(1) %}
-          {% if current_battery_converted < 0.00 and current_battery_converted > -0.9 %}
-            {{states('sensor.grid_usage_current')|float * -1}}
+          {% if current_battery_converted < 0.00 %}
+            {{states('sensor.grid_usage_current')|float(1)|round(1) * -1}}
           {% else %}
               {{ 0.0 }}
           {% endif %}
