@@ -192,7 +192,7 @@
           {% if cur_val|float > 0.1 %}
             {{ cur_val|float(1)|round(1) }}
           {% else %}
-            {{ cur_val|float * -1|float(1)|round(1) }}
+            {{ 0.0 }}
           {% endif %}
 
   # Grid use after House is all good > probably going to battery now if not at min charge
@@ -290,7 +290,7 @@
           {% if states('sensor.grid_usage_current')|float(1)|round(1) > 0.1 %}
             {{ states('sensor.grid_usage_current')|float(1)|round(1) }}
           {% else %}
-              {{ 0.0 }}
+            {{ 0.0 }}
           {% endif %}
 
   ## Give (return to grid) - Total
@@ -302,10 +302,10 @@
         friendly_name: "Grid Return Total (out) (kW)"
         value_template: >-
           {% set current_battery_converted = states('sensor.grid_usage_current')|float(1)|round(1) %}
-          {% if current_battery_converted < 0.00 %}
+          {% if current_battery_converted < -0.1 %}
             {{states('sensor.grid_usage_current')|float(1)|round(1) * -1}}
           {% else %}
-              {{ 0.0 }}
+            {{ 0.0 }}
           {% endif %}
 
   ################################### Grid - End
